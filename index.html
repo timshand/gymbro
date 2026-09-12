@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>GYM BRO — survive leg day</title>
+    <meta name="description" content="A Pac-Man-like arcade game. Dodge the regulars, reach the equipment, get strong enough to fight back." />
+    <meta name="theme-color" content="#080a14" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:title" content="GYM BRO" />
+    <meta property="og:description" content="Dodge the regulars. Reach the equipment. Become the alpha." />
+  </head>
+  <body>
+    <div id="app">
+      <header class="hud">
+        <div class="hud-block">
+          <span class="label">Score</span>
+          <span class="value" id="score">0</span>
+        </div>
+        <div class="hud-block">
+          <span class="label">Round</span>
+          <span class="value" id="level">1</span>
+        </div>
+        <div class="hud-block gains">
+          <span class="label">Gains</span>
+          <div class="meter" id="gainsMeter"></div>
+        </div>
+        <div class="hud-block">
+          <span class="label">Lives</span>
+          <span class="value lives" id="lives"></span>
+        </div>
+        <button id="muteBtn" class="mute" type="button" aria-label="Toggle sound">SOUND ON</button>
+      </header>
+
+      <div class="pump-strip" id="pumpBar">
+        <div class="pump-fill" id="pumpFill"></div>
+        <span class="pump-text" id="pumpText">REACH EQUIPMENT TO GET PUMPED</span>
+      </div>
+
+      <div class="stage-wrap">
+        <div class="stage">
+        <canvas id="game" aria-label="Gym floor"></canvas>
+
+        <div class="overlay" id="overlay">
+          <div class="panel">
+            <h1>GYM<span>BRO</span></h1>
+            <p class="tag">It's peak hour. Nobody re-racks. Everybody wants a piece of you.</p>
+            <ul class="rules">
+              <li><b>Move</b> with arrow keys, WASD, or swipe.</li>
+              <li><b>Reach equipment</b> to gain a permanent <b>GAINS</b> level — and a short <b>PUMP</b>.</li>
+              <li><b>Pips over each head</b> are their strength. Out-lift it and you can throw hands.</li>
+              <li>Touch anyone stronger than you and they'll <b>beat you up</b>.</li>
+            </ul>
+            <div class="roster" id="roster"></div>
+            <button id="startBtn" class="start" type="button">HIT THE FLOOR</button>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div class="pad" id="pad" aria-hidden="true">
+        <button data-dir="up">▲</button>
+        <div class="pad-row">
+          <button data-dir="left">◀</button>
+          <button data-dir="down">▼</button>
+          <button data-dir="right">▶</button>
+        </div>
+      </div>
+
+      <footer class="threats" id="threats"></footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

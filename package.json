@@ -1,0 +1,15 @@
+{
+  "name": "gymbro",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "GYM BRO — a Pac-Man-like arcade game about surviving leg day",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^7.1.5"
+  }
+}

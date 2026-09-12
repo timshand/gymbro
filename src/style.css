@@ -1,0 +1,310 @@
+:root {
+  --bg: #05060d;
+  --panel: #0d1122;
+  --line: rgba(90, 140, 255, 0.22);
+  --text: #e8eeff;
+  --dim: rgba(200, 216, 255, 0.55);
+  --accent: #ffd23f;
+  --cyan: #2de2ff;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+body {
+  background:
+    radial-gradient(1200px 700px at 50% -10%, rgba(45, 110, 255, 0.16), transparent 60%),
+    radial-gradient(900px 600px at 50% 110%, rgba(255, 90, 160, 0.08), transparent 60%),
+    var(--bg);
+  display: flex;
+  justify-content: center;
+  padding: clamp(8px, 2vw, 24px);
+  touch-action: manipulation;
+}
+
+#app {
+  width: min(100%, 640px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---------- HUD ---------- */
+.hud {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 2.5vw, 18px);
+  padding: 10px 14px;
+  background: linear-gradient(180deg, rgba(20, 28, 56, 0.9), rgba(10, 14, 30, 0.9));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.hud-block { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.hud-block.gains { flex: 1; }
+
+.label {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.value {
+  font-size: clamp(14px, 3.4vw, 19px);
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.value.lives { color: #ff6b8b; letter-spacing: 2px; }
+
+.meter { display: flex; gap: 3px; height: 14px; align-items: stretch; }
+
+.meter i {
+  flex: 1;
+  min-width: 5px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.meter i.on {
+  background: linear-gradient(180deg, #ffe066, #ff7a1a);
+  border-color: rgba(255, 200, 80, 0.7);
+  box-shadow: 0 0 8px rgba(255, 160, 40, 0.6);
+}
+
+.mute {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--dim);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font: inherit;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mute:hover { color: var(--text); border-color: rgba(140, 180, 255, 0.5); }
+
+/* ---------- Stage ---------- */
+.stage-wrap {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* The floor is square, so one width clamp keeps the whole board on screen. */
+.stage {
+  width: min(100%, calc(100dvh - 210px));
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #080a14;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6), inset 0 0 80px rgba(30, 70, 180, 0.1);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: auto;
+}
+
+.pump-strip {
+  position: relative;
+  height: 24px;
+  border-radius: 8px;
+  background: rgba(12, 16, 34, 0.8);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  flex: none;
+  transition: border-color 0.2s ease;
+}
+
+.pump-strip.active { border-color: rgba(255, 140, 40, 0.75); }
+
+.pump-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: linear-gradient(90deg, rgba(255, 60, 30, 0.9), rgba(255, 200, 60, 0.9));
+  transition: width 0.1s linear;
+}
+
+.pump-text {
+  position: relative;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  color: var(--dim);
+}
+
+.pump-strip.active .pump-text {
+  color: #1a0d00;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* ---------- Overlay ---------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(4, 6, 14, 0.9);
+  backdrop-filter: blur(3px);
+  z-index: 5;
+}
+.overlay[hidden] { display: none; }
+
+.panel {
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.panel h1 {
+  margin: 0 0 6px;
+  font-size: clamp(30px, 8vw, 44px);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-shadow: 0 0 24px rgba(255, 190, 60, 0.45);
+}
+.panel h1 span { color: var(--cyan); text-shadow: 0 0 24px rgba(45, 226, 255, 0.45); }
+
+.tag { margin: 0 0 14px; font-size: 11px; color: var(--dim); line-height: 1.6; }
+
+.rules {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 12px;
+  text-align: left;
+  font-size: 10.5px;
+  line-height: 1.75;
+  color: rgba(220, 232, 255, 0.8);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.rules li + li { margin-top: 5px; }
+.rules b { color: var(--accent); }
+
+.roster { display: grid; gap: 5px; margin-bottom: 16px; }
+
+.roster-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9.5px;
+  text-align: left;
+  color: var(--dim);
+}
+.roster-dot { width: 12px; height: 12px; border-radius: 50% 50% 3px 3px; flex: none; }
+.roster-name { color: var(--text); min-width: 84px; font-weight: 700; }
+.roster-str { margin-left: auto; display: flex; gap: 2px; flex: none; }
+.roster-str i { width: 4px; height: 9px; background: #ff5a5a; border-radius: 1px; }
+
+.start {
+  width: 100%;
+  padding: 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #1a1200;
+  background: linear-gradient(180deg, #ffe066, #ff9f1a);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255, 150, 40, 0.3);
+}
+.start:hover { filter: brightness(1.08); }
+.start:active { transform: translateY(1px); }
+
+/* ---------- Threat board ---------- */
+.threats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.threat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(12, 16, 34, 0.8);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  transition: all 0.2s ease;
+}
+.threat .dot { width: 9px; height: 9px; border-radius: 50% 50% 2px 2px; flex: none; }
+.threat .verdict { color: #ff6b6b; font-weight: 700; }
+.threat.beatable { border-color: rgba(110, 255, 180, 0.5); background: rgba(20, 50, 40, 0.7); }
+.threat.beatable .verdict { color: #6effb4; }
+
+/* ---------- Touch pad ---------- */
+.pad { display: none; user-select: none; }
+.pad-row { display: flex; gap: 10px; }
+
+.pad button {
+  width: 62px;
+  height: 52px;
+  font-size: 17px;
+  color: var(--text);
+  background: rgba(20, 28, 56, 0.85);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.pad button:active { background: rgba(45, 110, 255, 0.35); }
+
+@media (hover: none) and (pointer: coarse) {
+  .pad { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .stage { width: min(100%, calc(100dvh - 340px)); }
+}
+
+/* On a phone the stage is too short to hold the title card — go full screen. */
+@media (max-width: 560px), (max-height: 640px) {
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    padding: 20px 16px;
+    align-content: center;
+  }
+  .panel { max-width: 460px; }
+}
+
+@media (max-width: 420px) {
+  .rules { font-size: 9.5px; line-height: 1.7; }
+  .hud { padding: 8px 10px; gap: 8px; }
+  .roster-blurb { display: none; }
+  .roster-name { min-width: 0; flex: 1; }
+  .panel h1 { font-size: 34px; }
+}
